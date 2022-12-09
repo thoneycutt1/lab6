@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lab 6</title>
+    <link href="style.css" type="text/css" rel="stylesheet" />
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+	<style>
+		.dropdown-content.new {
+			width: 300px !important;
+			left: 100px;
+		}
+	</style>
+  </head>
+  <body class="container">
+    <h4>Lab 5 Brushing and Linking: Cereal Nutrition</h4>
+    <br />
+    <br />
+    <form>
+      <select id="addData" name="addDate"></select>
+    </form>
+    <div class="row">
+      <div class="col s7 m8 l9">
+        <div id="wrapper">
+          <div id="chart1"></div>
+        </div>
+      </div>
+      <div class="col s5 m4 l3">
+        <div class="row" id="cards">
+        </div>
+        <div class="row">
+          <div class="col s12 center">
+            <a class="btn-floating btn-large waves-effect waves-light dropdown-trigger red"
+             data-target="newList" ><i class="material-icons" id="newBtn">add</i></a
+            >
+			<ul id="newList" class='dropdown-content new' style="width:300px!important">
+			  </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+	<a href="#!" id="test" class="btn">test</a>
+  </body>
+</html>
