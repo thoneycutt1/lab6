@@ -38,6 +38,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     return colors[++colorIndex];
   };
   var currentScale = undefined;
+  var currentScale2 = undefined;
   var opt = {
     Population: {
       name: "Population",
@@ -107,12 +108,12 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     registered_auto: {
       name: "registered_auto",
       attribute: "registered_auto",
-      secondScale: false,
+      secondScale: true,
     },
     registered_motorcycle: {
       name: "registered_motorcycle",
       attribute: "registered_motorcycle",
-      secondScale: false,
+      secondScale: true,
     },
     rate_per_registered_auto: {
       name: "rate_per_registered_auto",
@@ -131,7 +132,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     },
   };
 
-  var width = 600;
+  var width = 640;
   var height = 500;
   var chart1 = d3
     .select("#chart1")
@@ -184,7 +185,6 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     ddContent.selectAll("li").on("click", () => {
       changeConfig();
     });
-    ddInitialize();
     generateConfig();
   };
 
@@ -206,9 +206,9 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       addToConfig(clickedAttribute, pickColor());
     });
   };
+  ddInitialize();
 
   const changeConfig = () => {
-    console.log(clickedAttribute);
     if (clickedAttribute == "delete") {
       d3.select("#c-" + origClicked).remove();
       d3.select("#dd-" + origClicked).remove();
@@ -252,6 +252,10 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     };
     generateScale();
     config.forEach((c) => {
+      var scale = currentScale;
+      if (opt[c.attribute].secondScale) {
+        scale = currentScale2;
+      }
       d3.select("#" + c.uniqueId)
         .transition()
         .attr(
@@ -259,12 +263,12 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
           d3
             .line()
             .x((row) => yearScale(row.Year))
-            .y((row) => currentScale(c.getAttr(row)))
+            .y((row) => scale(c.getAttr(row)))
         );
       for (let i = 0; i < csv.length; i++) {
         d3.select("#" + c.uniqueId + "-" + i)
           .transition()
-          .attr("cy", currentScale(c.getAttr(csv[i])));
+          .attr("cy", scale(c.getAttr(csv[i])));
       }
     });
   };
@@ -272,6 +276,10 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
   var generateConfig = () => {
     generateScale();
     config.forEach((c) => {
+      var scale = currentScale;
+      if (opt[c.attribute].secondScale) {
+        scale = currentScale2;
+      }
       if (!d3.select("#" + c.uniqueId).node()) {
         chart1
           .append("path")
@@ -284,14 +292,14 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
             d3
               .line()
               .x((d) => yearScale(d.Year))
-              .y((d) => currentScale(c.getAttr(d)))
+              .y((d) => scale(c.getAttr(d)))
           );
 
         for (let i = 0; i < csv.length; i++) {
           chart1
             .append("circle")
             .attr("cx", yearScale(csv[i].Year))
-            .attr("cy", currentScale(c.getAttr(csv[i])))
+            .attr("cy", scale(c.getAttr(csv[i])))
             .attr("stroke", "none")
             .attr("fill", c.color)
             .attr("r", 3)
@@ -306,12 +314,12 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
             d3
               .line()
               .x((row) => yearScale(row.Year))
-              .y((row) => currentScale(c.getAttr(row)))
+              .y((row) => scale(c.getAttr(row)))
           );
         for (let i = 0; i < csv.length; i++) {
           d3.select("#" + c.uniqueId + "-" + i)
             .transition()
-            .attr("cy", currentScale(c.getAttr(csv[i])));
+            .attr("cy", scale(c.getAttr(csv[i])));
         }
       }
     });
@@ -321,6 +329,11 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     .append("g")
     .attr("class", "scaleY")
     .attr("transform", "translate(60,0)");
+
+  chart1
+    .append("g")
+    .attr("class", "scaleY2")
+    .attr("transform", "translate(600,0)");
 
   var yearScale = d3
     .scaleLinear()
@@ -338,13 +351,24 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
 
   var generateScale = () => {
     var maxVal = 0;
+    var maxVal2 = 0;
     config.forEach((c) => {
-      maxVal = Math.max(maxVal, c.scale.domain()[1]);
+      if (!opt[c.attribute].secondScale) {
+        maxVal = Math.max(maxVal, c.scale.domain()[1]);
+      } else {
+        maxVal2 = Math.max(maxVal2, c.scale.domain()[1]);
+      }
     });
 
     currentScale = d3.scaleLinear().domain([maxVal, 0]).range([20, 480]);
-    var xAxis = d3.axisLeft(currentScale);
-    chart1.select(".scaleY").call(xAxis);
+    var yAxis = d3.axisLeft(currentScale);
+    chart1.select(".scaleY").call(yAxis);
+
+    if (maxVal2 != 0) {
+      currentScale2 = d3.scaleLinear().domain([maxVal2, 0]).range([20, 480]);
+      var yAxis2 = d3.axisRight(currentScale2);
+      chart1.select(".scaleY2").call(yAxis2);
+    }
   };
 
   addDataSelect = document.getElementById("addData");
@@ -371,12 +395,35 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     }
   };
 
-  d3.select("#test").on("click", () => {
+  d3.select("#preset1").on("click", () => {
     clear();
     config = [];
     addToConfig("Motorcycle", pickColor());
+    addToConfig("registered_motorcycle", pickColor());
+    generateConfig();
+  });
+
+  d3.select("#preset2").on("click", () => {
+    clear();
+    config = [];
     addToConfig("Car_Occupant", pickColor());
-    addToConfig("Total", pickColor());
+    addToConfig("registered_auto", pickColor());
+    generateConfig();
+  });
+
+  d3.select("#preset3").on("click", () => {
+    clear();
+    config = [];
+    addToConfig("Motorcycle", pickColor());
+    addToConfig("registered_motorcycle", pickColor());
+    generateConfig();
+  });
+
+  d3.select("#preset4").on("click", () => {
+    clear();
+    config = [];
+    addToConfig("Motorcycle", pickColor());
+    addToConfig("registered_motorcycle", pickColor());
     generateConfig();
   });
 });
