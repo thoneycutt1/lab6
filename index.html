@@ -1,34 +1,65 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8"/> 
-		<title>Lab 5 Brushing and Linking</title>
-		<link href="style.css" type="text/css" rel="stylesheet" />
-		<script src="https://d3js.org/d3.v4.min.js"></script>
-		<script type="text/javascript" src="main.js"></script>	 
-   	</head>
-   	<body>
-   		<h4></h4>
-   		<br />
-   		<br />
-	   	<div id="wrapper">
-			<div id="chart1">
-	    	</div>
-		  	<div id="chart2">
-	        </div>
-		  	<div id="chart3">
-		  		<strong>Low Calorie:</strong> <svg id="LowCalorie" width="20px" height="12px"></svg><br />
-		  		<strong>Medium Calorie:</strong> <svg id="MedCalorie" width="20px" height="12px"></svg><br />
-		  		<strong>High Calorie:</strong> <svg id="HighCalorie" width="20px" height="12px"></svg><br />
-		  		<p></p>
-				<strong>Cereal:</strong> <span id="cereal"></span><br />
-		  		<strong>Calories:</strong> <span id="calories"></span><br />
-		  		<strong>Fat Value:</strong> <span id="fat"></span><br />
-				<strong>Carb Value:</strong> <span id="carb"></span><br />
-		  		<strong>Fiber Value:</strong> <span id="fiber"></span><br />
-		  		<strong>Protein Value:</strong> <span id="protein"></span><br />
-	        </div>
-	   	</div>
-	</body>
-</html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lab 6</title>
+    <link href="style.css" type="text/css" rel="stylesheet" />
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+    <style>
+      .dropdown-content.new {
+        width: 300px !important;
+        left: 100px;
+      }
+    </style>
+  </head>
 
+  <body class="container">
+    <h4 class="center">Lab 6</h4>
+    <br />
+    <br />
+    <div class="row">
+      <div class="col m12 l9">
+        <div class="center" id="wrapper">
+          <div id="chart1"></div>
+        </div>
+				<div
+        class="col m12 hide-on-large-and-up center"
+        style="margin-top: 20px; margin-bottom: 20px"
+      >
+        <a href="#!" id="preset1" class="btn">preset 1</a>
+        <a href="#!" id="preset2" class="btn">preset 2</a>
+        <a href="#!" id="preset3" class="btn">preset 3</a>
+        <a href="#!" id="preset3" class="btn">preset 4</a>
+      </div>
+      </div>
+
+      <div class="col m12 l3">
+        <div class="row">
+          <span id="cards"></span>
+          <div class="col m6 l12 center" style="margin-top: 20px">
+            <a
+              class="btn-floating btn-large waves-effect waves-light dropdown-trigger red"
+              data-target="newList"
+              ><i class="material-icons" id="newBtn">add</i></a
+            >
+            <ul
+              id="newList"
+              class="dropdown-content new"
+              style="width: 300px !important"
+            ></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
