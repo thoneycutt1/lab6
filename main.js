@@ -132,7 +132,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     },
   };
 
-  var width = 650;
+  var width = 660;
   var height = 500;
   var chart1 = d3
     .select("#chart1")
@@ -215,12 +215,13 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     if (clickedAttribute == "delete") {
       d3.select("#c-" + origClicked).remove();
       d3.select("#dd-" + origClicked).remove();
+      d3.selectAll('.' + origClicked).remove();
+      d3.select('#' + origClicked).remove();
       for (let i = 0; i < config.length; i++) {
         if (origClicked == config[i].uniqueId) {
           config.splice(i, 1);
         }
       }
-      clear(false);
       setTimeout(() => {
         generateConfig();
       }, 20);
@@ -246,14 +247,15 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     changeConfig(attribute, index);
   };
 
-  const changeConfig = (attribute, index, addCard = FontFaceSetLoadEvent) => {
+  const changeConfig = (attribute, index, addCard = false, changeColor = false) => {
     var attrExtent = d3.extent(csv, (row) => row[attribute]);
     var scale = d3.scaleLinear().domain(attrExtent).range([20, 460]);
+    var color = (changeColor) ? pickColor() : config[index].color;
 
     config[index] = {
       uniqueId: config[index].uniqueId,
       attribute,
-      color: config[index].color,
+      color,
       getAttr: (d) => d[attribute],
       scale,
     };
@@ -268,6 +270,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       }
       d3.select("#" + c.uniqueId)
         .transition()
+        .attr("stroke", c.color)
         .attr(
           "d",
           d3
@@ -278,6 +281,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       for (let i = 0; i < csv.length; i++) {
         d3.select("#" + c.uniqueId + "-" + i)
           .transition()
+          .attr("fill", c.color)
           .attr("cy", scale(c.getAttr(csv[i])));
       }
     });
@@ -318,7 +322,6 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
         }
       } else {
         d3.select("#" + c.uniqueId)
-          .transition()
           .attr(
             "d",
             d3
@@ -328,7 +331,6 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
           );
         for (let i = 0; i < csv.length; i++) {
           d3.select("#" + c.uniqueId + "-" + i)
-            .transition()
             .attr("cy", scale(c.getAttr(csv[i])));
         }
       }
@@ -406,7 +408,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     }
     for (let i = 0; i < attrList.length; i++) {
       if (config.length > i) {
-        changeConfig(attrList[i], i);
+        changeConfig(attrList[i], i, true, true);
       } else {
         addToConfig(attrList[i], pickColor());
       }
