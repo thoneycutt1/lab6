@@ -17,11 +17,13 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     csv[i].Total_Per_100K = parseFloat(csv[i].Total_Per_100K);
     csv[i].registered_auto = parseFloat(csv[i].registered_auto);
     csv[i].registered_motorcycle = parseFloat(csv[i].registered_motorcycle);
-    csv[i].registered_truck = parseFloat(csv[i].rate_per_registered_auto);
+    csv[i].registered_truck = parseFloat(csv[i].registered_truck);
     csv[i].Car_Accidents_Per_Registration = parseFloat(
       csv[i].Car_Accidents_Per_Registration
     );
-    csv[i].car_vs_motorcycle = parseFloat(csv[i].car_vs_motorcycle);
+    csv[i].Motorcycle_Accident_Per_Registration = parseFloat(csv[i].Motorcycle_Accident_Per_Registration);
+    csv[i].Truck_Accidents_Per_Registration = parseFloat(csv[i].Truck_Accidents_Per_Registration);
+    csv[i].Registered_Cars_Per_Capita = parseFloat(csv[i].Registered_Cars_Per_Capita);
   }
   var colors = [
     "#3d6acb",
@@ -115,19 +117,24 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       attribute: "registered_motorcycle",
       secondScale: true,
     },
+    registered_truck: {
+      name: "registered_truck",
+      attribute: "registered_truck",
+      secondScale: true,
+    },
     Car_Accidents_Per_Registration: {
       name: "Car_Accidents_Per_Registration",
       attribute: "Car_Accidents_Per_Registration",
       secondScale: true,
     },
-    Truck_Accidents_Per_Registration: {
-      name: "Truck_Accidents_Per_Registration",
-      attribute: "Truck_Accidents_Per_Registration",
-      secondScale: false,
-    },
     Motorcycle_Accident_Per_Registration: {
       name: "Motorcycle_Accident_Per_Registration",
       attribute: "Motorcycle_Accident_Per_Registration",
+      secondScale: false,
+    },
+    Truck_Accidents_Per_Registration: {
+      name: "Truck_Accidents_Per_Registration",
+      attribute: "Truck_Accidents_Per_Registration",
       secondScale: false,
     },
     Registered_Cars_Per_Capita: {
