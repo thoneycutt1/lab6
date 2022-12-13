@@ -43,7 +43,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     Population: {
       name: "Population",
       attribute: "Population",
-      secondScale: false,
+      secondScale: true,
     },
     Car_Occupant: {
       name: "Car_Occupant",
@@ -132,7 +132,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     },
   };
 
-  var width = 640;
+  var width = 660;
   var height = 500;
   var chart1 = d3
     .select("#chart1")
@@ -156,7 +156,11 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
         scale,
       },
     ];
+    generateCard(attribute, uniqueId, color);
+    generateConfig();
+  };
 
+  const generateCard = (attribute, uniqueId, color) => {
     var cardHtml = `
     <div id="c-${uniqueId}" data-target="dd-${uniqueId}" class="card dropdown-trigger change" style="background-color:${color}">
       <div class="card-content white-text">
@@ -183,9 +187,8 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     M.Dropdown.init(elems, {});
     var ddContent = d3.selectAll(".dropdown-content.change");
     ddContent.selectAll("li").on("click", () => {
-      changeConfig();
+      changeConfigEvent();
     });
-    generateConfig();
   };
 
   const ddInitialize = () => {
@@ -208,28 +211,26 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
   };
   ddInitialize();
 
-  const changeConfig = () => {
+  const changeConfigEvent = () => {
     if (clickedAttribute == "delete") {
       d3.select("#c-" + origClicked).remove();
       d3.select("#dd-" + origClicked).remove();
+      d3.selectAll('.' + origClicked).remove();
+      d3.select('#' + origClicked).remove();
       for (let i = 0; i < config.length; i++) {
         if (origClicked == config[i].uniqueId) {
           config.splice(i, 1);
         }
       }
-      clear(false);
       setTimeout(() => {
         generateConfig();
       }, 20);
       return;
     }
     var attribute = clickedAttribute;
-    var attrExtent = d3.extent(csv, (row) => row[attribute]);
-    var scale = d3.scaleLinear().domain(attrExtent).range([20, 460]);
     var index = 0;
     for (let i = 0; i < config.length; i++) {
       if (origClicked == config[i].uniqueId) {
-        console.log(origClicked + " 000 " + config[i].uniqueId);
         index = i;
       }
     }
@@ -243,13 +244,24 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       .select("li")
       .select("a")
       .node().innerHTML = `<i class="material-icons">delete</i>Delete ${opt[attribute].name}`;
+    changeConfig(attribute, index);
+  };
+
+  const changeConfig = (attribute, index, addCard = false, changeColor = false) => {
+    var attrExtent = d3.extent(csv, (row) => row[attribute]);
+    var scale = d3.scaleLinear().domain(attrExtent).range([20, 460]);
+    var color = (changeColor) ? pickColor() : config[index].color;
+
     config[index] = {
       uniqueId: config[index].uniqueId,
       attribute,
-      color: config[index].color,
+      color,
       getAttr: (d) => d[attribute],
       scale,
     };
+    if (addCard) {
+      generateCard(attribute, config[index].uniqueId, config[index].color);
+    }
     generateScale();
     config.forEach((c) => {
       var scale = currentScale;
@@ -258,6 +270,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       }
       d3.select("#" + c.uniqueId)
         .transition()
+        .attr("stroke", c.color)
         .attr(
           "d",
           d3
@@ -268,6 +281,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       for (let i = 0; i < csv.length; i++) {
         d3.select("#" + c.uniqueId + "-" + i)
           .transition()
+          .attr("fill", c.color)
           .attr("cy", scale(c.getAttr(csv[i])));
       }
     });
@@ -308,7 +322,6 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
         }
       } else {
         d3.select("#" + c.uniqueId)
-          .transition()
           .attr(
             "d",
             d3
@@ -318,7 +331,6 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
           );
         for (let i = 0; i < csv.length; i++) {
           d3.select("#" + c.uniqueId + "-" + i)
-            .transition()
             .attr("cy", scale(c.getAttr(csv[i])));
         }
       }
@@ -329,11 +341,6 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     .append("g")
     .attr("class", "scaleY")
     .attr("transform", "translate(60,0)");
-
-  chart1
-    .append("g")
-    .attr("class", "scaleY2")
-    .attr("transform", "translate(600,0)");
 
   var yearScale = d3
     .scaleLinear()
@@ -365,9 +372,15 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     chart1.select(".scaleY").call(yAxis);
 
     if (maxVal2 != 0) {
+      chart1
+        .append("g")
+        .attr("class", "scaleY2")
+        .attr("transform", "translate(600,0)");
       currentScale2 = d3.scaleLinear().domain([maxVal2, 0]).range([20, 480]);
       var yAxis2 = d3.axisRight(currentScale2);
       chart1.select(".scaleY2").call(yAxis2);
+    } else {
+      chart1.select(".scaleY2").remove();
     }
   };
 
@@ -384,49 +397,44 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     addToConfig(attributeToAdd, "black");
   });
 
+  clearCards = () => {
+    d3.selectAll(".card").remove();
+  };
+
+  modifyConfig = (attrList) => {
+    clearCards();
+    if (attrList.length < config.length) {
+      config = config.splice(0, i);
+    }
+    for (let i = 0; i < attrList.length; i++) {
+      if (config.length > i) {
+        changeConfig(attrList[i], i, true, true);
+      } else {
+        addToConfig(attrList[i], pickColor());
+      }
+    }
+  }
+
   addToConfig("Motorcycle", pickColor());
   addToConfig("Car_Occupant", pickColor());
 
-  clear = (clearCard = true) => {
-    d3.selectAll("path").remove();
-    d3.selectAll("circle").remove();
-    if (clearCard) {
-      d3.selectAll(".card").remove();
-    }
-  };
-
   d3.select("#preset1").on("click", () => {
-    clear();
-    config = [];
-    addToConfig("Motorcycle", pickColor());
-    addToConfig("registered_motorcycle", pickColor());
-    generateConfig();
+    modifyConfig(["Car_Occupant", "registered_auto"]);
   });
 
   d3.select("#preset2").on("click", () => {
-    clear();
-    config = [];
-    addToConfig("Car_Occupant", pickColor());
-    addToConfig("registered_auto", pickColor());
-    generateConfig();
+    modifyConfig(["Motorcycle", "registered_motorcycle"]);
   });
 
   d3.select("#preset3").on("click", () => {
-    clear();
-    config = [];
-    addToConfig("Motorcycle", pickColor());
-    addToConfig("registered_motorcycle", pickColor());
-    generateConfig();
+    modifyConfig(["Car_Occupant", "registered_auto"]);
   });
 
   d3.select("#preset4").on("click", () => {
-    clear();
-    config = [];
-    addToConfig("Motorcycle", pickColor());
-    addToConfig("registered_motorcycle", pickColor());
-    generateConfig();
+    modifyConfig(["Motorcycle", "registered_motorcycle"]);
   });
 });
+
 var origClicked = undefined;
 var clickedAttribute = undefined;
 function clicked(name, orig) {
