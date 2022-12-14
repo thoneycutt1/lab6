@@ -390,7 +390,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     .append("text")
     .attr("class", "labelX")
     .attr("text-anchor", "end")
-    .attr("x", 335)
+    .attr("x", 375)
     .attr("y", 520)
     .text("Year");
 
