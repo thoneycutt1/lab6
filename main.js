@@ -150,7 +150,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     },
   };
 
-  var width = 680;
+  var width = 710;
   var height = 520;
   var chart1 = d3
     .select("#chart1")
@@ -373,17 +373,17 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
   chart1
     .append("g")
     .attr("class", "scaleY")
-    .attr("transform", "translate(70,0)");
+    .attr("transform", "translate(80,0)");
 
   var yearScale = d3
     .scaleLinear()
     .domain([csv[0].Year, csv[csv.length - 1].Year])
-    .range([70, 610]);
+    .range([80, 620]);
   var xAxis = d3.axisBottom(yearScale).tickFormat(d3.format("d"));
   chart1
     .append("g")
     .attr("class", "scaleX")
-    .attr("transform", "translate(0,490)")
+    .attr("transform", "translate(0,500)")
     .call(xAxis);
 
   chart1
@@ -391,22 +391,48 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     .attr("class", "labelX")
     .attr("text-anchor", "end")
     .attr("x", 335)
-    .attr("y", 510)
+    .attr("y", 520)
     .text("Year");
+
+    chart1
+    .append("text")
+    .attr("class", "labelY2")
+    .attr("text-anchor", "end")
+    .attr("x", -250)
+    .attr("y", 705)
+    .text("NA")
+    .attr("transform", "rotate(-90)")
+    .attr("text-anchor","middle");
+
+    chart1
+    .append("text")
+    .attr("class", "labelY")
+    .attr("text-anchor", "end")
+    .attr("x", -250)
+    .attr("y", 14)
+    .text("NA")
+    .attr("transform", "rotate(-90)")
+    .attr("text-anchor","middle");
 
   var generateScale = () => {
     var maxVal = 0;
     var maxVal2 = 0;
+    var label1 = "";
+    var label2 = "";
     config.forEach((c) => {
       if (!c.secondScale) {
         maxVal = Math.max(maxVal, c.scale.domain()[1]);
+        label1 += opt[c.attribute].name + ', ';
       } else {
         maxVal2 = Math.max(maxVal2, c.scale.domain()[1]);
+        label2 += opt[c.attribute].name + ', ';
       }
     });
-    console.log(config);
+    
+    d3.select(".labelY").text(label1);
+    d3.select(".labelY2").text(label2);
 
-    currentScale = d3.scaleLinear().domain([maxVal, 0]).range([30, 490]);
+    currentScale = d3.scaleLinear().domain([maxVal, 0]).range([40, 500]);
     var yAxis = d3.axisLeft(currentScale);
     chart1.select(".scaleY").call(yAxis);
 
@@ -414,8 +440,8 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       chart1
         .append("g")
         .attr("class", "scaleY2")
-        .attr("transform", "translate(610,0)");
-      currentScale2 = d3.scaleLinear().domain([maxVal2, 0]).range([30, 490]);
+        .attr("transform", "translate(620,0)");
+      currentScale2 = d3.scaleLinear().domain([maxVal2, 0]).range([40, 500]);
       var yAxis2 = d3.axisRight(currentScale2);
       chart1.select(".scaleY2").call(yAxis2);
     } else {
@@ -471,31 +497,31 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       { name: "Car_Occupant" },
       { name: "registered_auto" },
     ]);
-    d3.select('#presetName').text('preset1');
+    d3.select('#presetName').text('Car Registerations vs Casualties');
     d3.select('#desc').text('test');
   });
 
   d3.select("#preset2").on("click", () => {
     modifyConfig([
-      { name: "Car_Occupant" },
-      { name: "registered_auto" },
+      { name: "Trucks" },
+      { name: "registered_truck" },
     ]);
-    d3.select('#presetName').text('preset2');
+    d3.select('#presetName').text('Truck Registerations vs Casualties');
     d3.select('#desc').text('test');
   });
 
   d3.select("#preset3").on("click", () => {
     modifyConfig([
-      { name: "Population", second: false },
-      { name: "registered_auto" },
+      { name: "Motorcycle" },
+      { name: "registered_motorcycle" },
     ]);
-    d3.select('#presetName').text('preset3');
+    d3.select('#presetName').text('Motorcycle Registerations vs Casualties');
     d3.select('#desc').text('test');
   });
 
   d3.select("#preset4").on("click", () => {
     modifyConfig([
-      { name: "Car_Occupant" },
+      { name: "Population", second: false },
       { name: "registered_auto" },
     ]);
     d3.select('#presetName').text('preset4');
