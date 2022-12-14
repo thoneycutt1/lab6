@@ -154,10 +154,13 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     .attr("height", height);
 
   var config = [];
-  const addToConfig = (attribute, color) => {
+  const addToConfig = (attribute, color, secondScale = null) => {
     var attrExtent = d3.extent(csv, (row) => row[attribute]);
     var scale = d3.scaleLinear().domain(attrExtent).range([20, 450]);
     var uniqueId = "x" + Math.floor(Math.random() * 1000).toString();
+    if (secondScale == null) {
+      secondScale = opt[attribute].secondScale;
+    }
     config = [
       ...config,
       {
@@ -166,6 +169,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
         color,
         getAttr: (d) => d[attribute],
         scale,
+        secondScale
       },
     ];
     generateCard(attribute, uniqueId, color);
@@ -276,6 +280,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       attribute,
       color,
       getAttr: (d) => d[attribute],
+      secondScale: opt[attribute].secondScale,
       scale,
     };
     if (addCard) {
@@ -284,7 +289,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     generateScale();
     config.forEach((c) => {
       var scale = currentScale;
-      if (opt[c.attribute].secondScale) {
+      if (c.secondScale) {
         scale = currentScale2;
       }
       d3.select("#" + c.uniqueId)
@@ -310,7 +315,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     generateScale();
     config.forEach((c) => {
       var scale = currentScale;
-      if (opt[c.attribute].secondScale) {
+      if (c.secondScale) {
         scale = currentScale2;
       }
       if (!d3.select("#" + c.uniqueId).node()) {
@@ -379,18 +384,19 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     .attr("text-anchor", "end")
     .attr("x", 330)
     .attr("y", 510)
-    .text("y label");
+    .text("Year");
 
   var generateScale = () => {
     var maxVal = 0;
     var maxVal2 = 0;
     config.forEach((c) => {
-      if (!opt[c.attribute].secondScale) {
+      if (!c.secondScale) {
         maxVal = Math.max(maxVal, c.scale.domain()[1]);
       } else {
         maxVal2 = Math.max(maxVal2, c.scale.domain()[1]);
       }
     });
+    console.log(config);
 
     currentScale = d3.scaleLinear().domain([maxVal, 0]).range([20, 480]);
     var yAxis = d3.axisLeft(currentScale);
