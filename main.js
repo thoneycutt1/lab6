@@ -498,7 +498,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       { name: "registered_auto" },
     ]);
     d3.select('#presetName').text('Car Registerations vs Casualties');
-    d3.select('#desc').text('test');
+    d3.select('#desc').text('When looking at car registrations and car casualties, we can see a rough correlation between the number of car registered and casualties. As time goes on, we can see the number of casualty trends below the registration line likely as a result of improved automotive saftey such as advanced airbags and better crumple zones. ');
   });
 
   d3.select("#preset2").on("click", () => {
@@ -507,7 +507,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       { name: "registered_truck" },
     ]);
     d3.select('#presetName').text('Truck Registerations vs Casualties');
-    d3.select('#desc').text('test');
+    d3.select('#desc').text('When looking at motorcycle registrations and motorcycles casualties, we see very little correlation unlike the correlation that exists for both car and trucks.');
   });
 
   d3.select("#preset3").on("click", () => {
@@ -516,7 +516,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       { name: "registered_motorcycle" },
     ]);
     d3.select('#presetName').text('Motorcycle Registerations vs Casualties');
-    d3.select('#desc').text('test');
+    d3.select('#desc').text('When looking at motorcycle registrations and motorcycles casualties, we can see a high correlation between the number of motorcycles registered and motorcycle casualties.');
   });
 
   d3.select("#preset4").on("click", () => {
