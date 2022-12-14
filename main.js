@@ -21,9 +21,15 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     csv[i].Car_Accidents_Per_Registration = parseFloat(
       csv[i].Car_Accidents_Per_Registration
     );
-    csv[i].Motorcycle_Accident_Per_Registration = parseFloat(csv[i].Motorcycle_Accident_Per_Registration);
-    csv[i].Truck_Accidents_Per_Registration = parseFloat(csv[i].Truck_Accidents_Per_Registration);
-    csv[i].Registered_Cars_Per_Capita = parseFloat(csv[i].Registered_Cars_Per_Capita);
+    csv[i].Motorcycle_Accident_Per_Registration = parseFloat(
+      csv[i].Motorcycle_Accident_Per_Registration
+    );
+    csv[i].Truck_Accidents_Per_Registration = parseFloat(
+      csv[i].Truck_Accidents_Per_Registration
+    );
+    csv[i].Registered_Cars_Per_Capita = parseFloat(
+      csv[i].Registered_Cars_Per_Capita
+    );
   }
   var colors = [
     "#3d6acb",
@@ -130,21 +136,21 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     Motorcycle_Accident_Per_Registration: {
       name: "Motorcycle_Accident_Per_Registration",
       attribute: "Motorcycle_Accident_Per_Registration",
-      secondScale: false,
+      secondScale: true,
     },
     Truck_Accidents_Per_Registration: {
       name: "Truck_Accidents_Per_Registration",
       attribute: "Truck_Accidents_Per_Registration",
-      secondScale: false,
+      secondScale: true,
     },
     Registered_Cars_Per_Capita: {
       name: "Registered_Cars_Per_Capita",
       attribute: "Registered_Cars_Per_Capita",
-      secondScale: false,
-    }
+      secondScale: true,
+    },
   };
 
-  var width = 660;
+  var width = 680;
   var height = 520;
   var chart1 = d3
     .select("#chart1")
@@ -169,7 +175,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
         color,
         getAttr: (d) => d[attribute],
         scale,
-        secondScale
+        secondScale,
       },
     ];
     generateCard(attribute, uniqueId, color);
@@ -178,7 +184,6 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
 
   const generateCard = (attribute, uniqueId, color) => {
     var cardHtml = `
-    <div class="col m6 l12">
       <div id="c-${uniqueId}" data-target="dd-${uniqueId}" class="card dropdown-trigger change" style="background-color:${color}">
         <div class="card-content white-text">
             <span class="card-title">${opt[attribute].name}</span>
@@ -187,8 +192,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       <ul id="dd-${uniqueId}" class='dropdown-content change' style="margin-top:50px">
         <li><a href="#!" onclick="clicked('delete', '${uniqueId}')"><i class="material-icons">delete</i>Delete ${opt[attribute].name}</a></li>
         <li class="divider" tabindex="-1"></li>
-      </ul>
-    </div>`;
+      </ul>`;
     var cards = document.getElementById("cards");
     cards.innerHTML = cards.innerHTML + cardHtml;
     var ddOptions = document.getElementById("dd-" + uniqueId);
@@ -269,18 +273,22 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     attribute,
     index,
     addCard = false,
-    changeColor = false
+    changeColor = false,
+    secondScale = null,
   ) => {
     var attrExtent = d3.extent(csv, (row) => row[attribute]);
     var scale = d3.scaleLinear().domain(attrExtent).range([20, 460]);
     var color = changeColor ? pickColor() : config[index].color;
-
+    if (secondScale == null) {
+      console.log(opt[attribute])
+      secondScale = opt[attribute].secondScale;
+    }
     config[index] = {
       uniqueId: config[index].uniqueId,
       attribute,
       color,
       getAttr: (d) => d[attribute],
-      secondScale: opt[attribute].secondScale,
+      secondScale,
       scale,
     };
     if (addCard) {
@@ -365,24 +373,24 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
   chart1
     .append("g")
     .attr("class", "scaleY")
-    .attr("transform", "translate(60,0)");
+    .attr("transform", "translate(70,0)");
 
   var yearScale = d3
     .scaleLinear()
     .domain([csv[0].Year, csv[csv.length - 1].Year])
-    .range([60, 600]);
+    .range([70, 610]);
   var xAxis = d3.axisBottom(yearScale).tickFormat(d3.format("d"));
   chart1
     .append("g")
     .attr("class", "scaleX")
-    .attr("transform", "translate(0,480)")
+    .attr("transform", "translate(0,490)")
     .call(xAxis);
 
   chart1
     .append("text")
     .attr("class", "labelX")
     .attr("text-anchor", "end")
-    .attr("x", 330)
+    .attr("x", 335)
     .attr("y", 510)
     .text("Year");
 
@@ -398,7 +406,7 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
     });
     console.log(config);
 
-    currentScale = d3.scaleLinear().domain([maxVal, 0]).range([20, 480]);
+    currentScale = d3.scaleLinear().domain([maxVal, 0]).range([30, 490]);
     var yAxis = d3.axisLeft(currentScale);
     chart1.select(".scaleY").call(yAxis);
 
@@ -406,8 +414,8 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
       chart1
         .append("g")
         .attr("class", "scaleY2")
-        .attr("transform", "translate(600,0)");
-      currentScale2 = d3.scaleLinear().domain([maxVal2, 0]).range([20, 480]);
+        .attr("transform", "translate(610,0)");
+      currentScale2 = d3.scaleLinear().domain([maxVal2, 0]).range([30, 490]);
       var yAxis2 = d3.axisRight(currentScale2);
       chart1.select(".scaleY2").call(yAxis2);
     } else {
@@ -435,22 +443,22 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
   modifyConfig = (attrList) => {
     clearCards();
     if (attrList.length < config.length) {
-      console.log('here');
       for (let i = attrList.length; i < config.length; i++) {
-        console.log(config[i].attribute)
         d3.selectAll("." + config[i].uniqueId).remove();
         d3.select("#" + config[i].uniqueId).remove();
       }
-      console.log(config);
       config = config.splice(0, attrList.length);
-      console.log(config);
     }
     for (let i = 0; i < attrList.length; i++) {
+      var second = null;
+      if (attrList[i].second != undefined) {
+        second = attrList[i].second;
+      }
+      console.log(attrList);
       if (config.length > i) {
-        changeConfig(attrList[i], i, true, true);
+        changeConfig(attrList[i].name, i, true, true, second);
       } else {
-        console.log('addd');
-        addToConfig(attrList[i], pickColor());
+        addToConfig(attrList[i].name, pickColor(), second);
       }
     }
   };
@@ -459,19 +467,39 @@ d3.csv("http://localhost:8080/data.csv", function (csv) {
   addToConfig("Car_Occupant", pickColor());
 
   d3.select("#preset1").on("click", () => {
-    modifyConfig(["Car_Occupant", "registered_auto"]);
+    modifyConfig([
+      { name: "Car_Occupant" },
+      { name: "registered_auto" },
+    ]);
+    d3.select('#presetName').text('preset1');
+    d3.select('#desc').text('test');
   });
 
   d3.select("#preset2").on("click", () => {
-    modifyConfig(["Motorcycle", "registered_motorcycle"]);
+    modifyConfig([
+      { name: "Car_Occupant" },
+      { name: "registered_auto" },
+    ]);
+    d3.select('#presetName').text('preset2');
+    d3.select('#desc').text('test');
   });
 
   d3.select("#preset3").on("click", () => {
-    modifyConfig(["Car_Occupant", "registered_auto"]);
+    modifyConfig([
+      { name: "Population", second: false },
+      { name: "registered_auto" },
+    ]);
+    d3.select('#presetName').text('preset3');
+    d3.select('#desc').text('test');
   });
 
   d3.select("#preset4").on("click", () => {
-    modifyConfig(["Motorcycle", "registered_motorcycle"]);
+    modifyConfig([
+      { name: "Car_Occupant" },
+      { name: "registered_auto" },
+    ]);
+    d3.select('#presetName').text('preset4');
+    d3.select('#desc').text('test');
   });
 });
 
