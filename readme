@@ -1,4 +1,0 @@
-To start the server run: 
-python -m http.server 8080
-
-There are no additional configuration requirements.
